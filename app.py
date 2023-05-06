@@ -3,13 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user
 import hashlib
 
-application = Flask(__name__)
-application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user.db'
-application.config['SECRET_KEY'] = "aforum"
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user.db'
+app.config['SECRET_KEY'] = "aforum"
 
-db = SQLAlchemy(application)
+db = SQLAlchemy(app)
 login_manager = LoginManager()
-login_manager.init_app(application)
+login_manager.init_app(app)
 
 salt="HasAASdwsg"
 
@@ -58,19 +58,19 @@ class UserCommentDownvote(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'), primary_key=True)
 
-with application.app_context():
+with app.app_context():
     db.create_all() 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@application.route('/')
+@app.route('/')
 def main():
     all_discussions = Discussion.query.all()
     return render_template('main.html', all_discussions=all_discussions)
 
-@application.route('/filter')
+@app.route('/filter')
 def filter():
     cat = request.args.get('cat')
     print(cat)
@@ -81,7 +81,7 @@ def filter():
         filter_discussions = Discussion.query.filter_by(discussion_category=cat).all()
         return render_template('filtered.html', filter_discussions=filter_discussions)
 
-@application.route('/new_discussion', methods=['GET', 'POST'])
+@app.route('/new_discussion', methods=['GET', 'POST'])
 def new_discussion():
     if current_user.is_authenticated:
         render_template('new_discussion.html')
@@ -101,7 +101,7 @@ def new_discussion():
         return render_template('login.html')
     return render_template('new_discussion.html')
 
-@application.route('/discussion_link/<disc_name>', methods=['GET', 'POST'])
+@app.route('/discussion_link/<disc_name>', methods=['GET', 'POST'])
 def discussion_link(disc_name):
     disc_id = Discussion.query.filter_by(discussion_topic=disc_name).first()
     disc = Discussion.query.filter_by(discussion_topic=disc_name)
@@ -109,7 +109,7 @@ def discussion_link(disc_name):
     comments = Comment.query.filter_by(discussion_id=disc_id.id).all()
     return render_template('discussion_link.html', disc=disc, comments=comments, user=user)
 
-@application.route('/discussions/<disc_name>/submit_comment', methods=['POST'])
+@app.route('/discussions/<disc_name>/submit_comment', methods=['POST'])
 def submit_comment(disc_name):
     comment = request.form.get('comment')
     disc_id = Discussion.query.filter_by(discussion_topic=disc_name).first()
@@ -119,7 +119,7 @@ def submit_comment(disc_name):
     db.session.commit()
     return redirect(url_for('discussion_link', disc_name=disc_name))
 
-@application.route('/upvote/<disc_name>/<int:comment_id>', methods=['POST'])
+@app.route('/upvote/<disc_name>/<int:comment_id>', methods=['POST'])
 def upvote(disc_name, comment_id):
     if current_user.is_authenticated:
         comment = Comment.query.filter_by(id=comment_id).first()
@@ -138,7 +138,7 @@ def upvote(disc_name, comment_id):
         return render_template('login.html')
     return redirect(url_for('discussion_link', disc_name=disc_name))
 
-@application.route('/downvote/<disc_name>/<int:comment_id>', methods=['POST'])
+@app.route('/downvote/<disc_name>/<int:comment_id>', methods=['POST'])
 def downvote(disc_name, comment_id):
     if current_user.is_authenticated:
         comment = Comment.query.filter_by(id=comment_id).first()
@@ -158,7 +158,7 @@ def downvote(disc_name, comment_id):
     return redirect(url_for('discussion_link', disc_name=disc_name))
 
 
-@application.route('/logout', methods=['GET', 'POST'])
+@app.route('/logout', methods=['GET', 'POST'])
 def logout():
     if request.method == 'POST':
         logout_user()
@@ -166,7 +166,7 @@ def logout():
     else:
         return render_template('logout.html')
 
-@application.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main'))
@@ -186,7 +186,7 @@ def login():
 
     return render_template('login.html')
 
-@application.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
@@ -204,4 +204,4 @@ def register():
     return render_template('register.html')
 
 if __name__ == '__main__':
-    application.run(debug=True)
+    app.run(debug=True)
