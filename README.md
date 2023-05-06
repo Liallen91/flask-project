@@ -1,3 +1,3 @@
-A class project website where I created a forum
+A class project website where my group created a forum
 
 Hosted at: https://gatheringguild.onrender.com/
