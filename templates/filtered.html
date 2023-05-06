@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<img alt="Runescape Landscape" src ="https://i.redd.it/1d9d5numabz51.png">
+<div class = "main_text">
+<h1>Discussions</h1></h1>
+<div class ="greyed">
+<button id = "disc_butt"><a class="btn" href="{{ url_for('new_discussion') }}">New Discussion</a></button>
+
+<div class="form">
+    <form action="{{ url_for('filter', cat='') }}" method="GET">
+        <select name="cat" id="filter">
+            <option value="All">All</option>
+            <option value="Weapons">Weapons</option>
+            <option value="Abilitys">Abilitys</option>
+            <option value="Armor">Armor</option>
+            <option value="Rings">Rings</option>
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Topic</th>
+            <th>Category</th>
+            <th>Replies</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for discussion in filter_discussions %}
+            <tr>    
+                <div id = "discussions">
+                    <td><a href={{ url_for('discussion_link', disc_name = discussion.discussion_topic) }}>{{ discussion.discussion_topic }}</a></td>
+            </div>
+                <td>{{ discussion.discussion_category }}</td>
+                <td>{{ discussion.discussion_replies }} </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+</div>
+{% endblock %}

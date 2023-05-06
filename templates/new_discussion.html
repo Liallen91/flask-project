@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="form">
+    <form action="{{ url_for('new_discussion') }}" method="post">
+        <input type="text" placeholder="Discussion Topic", id = "discussion_topic", name = "discussion_topic"/>
+        <input type="text" placeholder="Discussion text", id = "discussion_text", name = "discussion_text"/>
+        <select name="discussion_category" id="discussion_category">
+            <option value="" disabled selected>Select a category</option>
+            <option value="Weapons">Weapons</option>
+            <option value="Abilitys">Abilitys</option>
+            <option value="Armor">Armor</option>
+            <option value="Rings">Rings</option>
+        </select>
+        <button type="submit" href="{{ url_for('main') }}">Create Discussion</button>
+    </form>
+</div>
+
+{% endblock %}

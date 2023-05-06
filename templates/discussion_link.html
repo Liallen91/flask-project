@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% for discussion in disc %}
+    <h1>  {{ discussion.discussion_topic }} </h1>
+    <p> Posted by: {{ user.username }}
+    <p id = "disc_post">{{ discussion.discussion_text }}</p>
+    {% endfor %}
+
+<div class="form">
+    <form action="{{ url_for('submit_comment', disc_name=disc.first().discussion_topic) }}" method="post">
+        <input type="text" placeholder="Comment here" id="comment" name="comment">
+        <button type="submit">New Comment</button>
+    </form>
+</div>
+
+
+    {% for comment in comments %}
+    <div class="form" id ="upvote_downvote">
+        <div>  
+            <p>Karma: {{ comment.votes }}</p>
+            <form action="{{ url_for('upvote', disc_name=disc.first().discussion_topic, comment_id=comment.id) }}" method="post">
+                <button type="submit">👍</button>
+            </form>
+            <form action="{{ url_for('downvote', disc_name=disc.first().discussion_topic, comment_id=comment.id) }}" method="post">
+                <button type="submit">👎</button>
+            </form>
+        </div>
+        <div>
+            <p><b>Posted by: {{ comment.user.username }}</b></p>
+            <p>{{ comment.comment }}</p>
+        </div>
+
+    </div>
+    {% endfor %}
+
+
+{% endblock %}
