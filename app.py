@@ -111,13 +111,16 @@ def discussion_link(disc_name):
 
 @app.route('/discussions/<disc_name>/submit_comment', methods=['POST'])
 def submit_comment(disc_name):
-    comment = request.form.get('comment')
-    disc_id = Discussion.query.filter_by(discussion_topic=disc_name).first()
-    com = Comment(comment=comment, votes=0, discussion_id=disc_id.id, user_id=current_user.id)
-    disc_id.discussion_replies += 1
-    db.session.add(com)
-    db.session.commit()
-    return redirect(url_for('discussion_link', disc_name=disc_name))
+    if current_user.is_authenticated:
+        comment = request.form.get('comment')
+        disc_id = Discussion.query.filter_by(discussion_topic=disc_name).first()
+        com = Comment(comment=comment, votes=0, discussion_id=disc_id.id, user_id=current_user.id)
+        disc_id.discussion_replies += 1
+        db.session.add(com)
+        db.session.commit()
+        return redirect(url_for('discussion_link', disc_name=disc_name))
+    else:
+        return render_template('login.html')
 
 @app.route('/upvote/<disc_name>/<int:comment_id>', methods=['POST'])
 def upvote(disc_name, comment_id):
